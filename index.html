@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMUANG 1/6 - TOKYO DIGITAL HUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #6366f1; --neon-pink: #ff007a; --neon-blue: #00d4ff;
+            --tokyo-night: #1a1a2e; --white: #ffffff; --bg: #f8fafc;
+            --success: #22c55e; --warning: #f59e0b; --gray: #94a3b8;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Kanit', 'Noto Sans JP', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; min-height: 100vh; padding: 15px; color: #1e293b; }
+        
+        .app-container { background: var(--white); width: 100%; max-width: 420px; border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); padding: 25px; display: flex; flex-direction: column; position: relative; overflow: hidden; min-height: 85vh; }
+
+        /* --- LOGIN PAGE --- */
+        .logo-area { text-align: center; margin: 40px 0 30px; }
+        .logo-area img { width: 110px; filter: drop-shadow(0 0 10px rgba(255,0,122,0.3)); }
+        .logo-area h2 { letter-spacing: 2px; margin: 15px 0 5px; color: var(--tokyo-night); font-weight: 700; }
+        .logo-area p { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+
+        input, select { width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 15px; margin-bottom: 12px; outline: none; font-family: 'Kanit'; transition: 0.3s; background: #fff; }
+        input:focus { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255,0,122,0.1); }
+
+        .btn-action { background: var(--tokyo-night); color: white; border: none; padding: 15px; border-radius: 18px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; border-bottom: 4px solid #000; font-family: 'Kanit'; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-action:active { transform: translateY(2px); border-bottom: 0; }
+
+        /* --- DASHBOARD --- */
+        .fund-banner { background: var(--tokyo-night); color: white; padding: 25px; border-radius: 30px; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 20px rgba(26,26,46,0.2); }
+        .fund-amount { font-size: 36px; font-weight: 700; color: var(--neon-blue); text-shadow: 0 0 15px rgba(0,212,255,0.4); }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .menu-item { background: #fff; border: 1px solid #f1f5f9; padding: 20px; border-radius: 25px; cursor: pointer; display: flex; flex-direction: column; align-items: center; transition: 0.3s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .menu-item:hover { border-color: var(--neon-pink); transform: translateY(-3px); }
+        .menu-item i { font-size: 28px; margin-bottom: 10px; color: var(--tokyo-night); }
+
+        /* --- TASKS --- */
+        .task-card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 15px; border-left: 6px solid var(--tokyo-night); box-shadow: 8px 8px 0px #f1f5f9; border: 1px solid #eee; position: relative; }
+        .task-card.done { border-left-color: var(--neon-blue); opacity: 0.7; }
+        .task-owner { font-size: 10px; color: #fff; background: var(--tokyo-night); padding: 2px 10px; border-radius: 5px; text-transform: uppercase; }
+
+        /* --- MONEY STATUS --- */
+        .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 10px; color: white; font-weight: 600; }
+        .status-complete { background: var(--success); }
+        .status-incomplete { background: var(--warning); }
+        .status-none { background: var(--gray); }
+        .gender-divider { padding: 10px; margin: 15px 0 10px; font-weight: 600; border-radius: 10px; font-size: 14px; }
+
+        /* --- PROFILE --- */
+        .profile-img-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 15px; }
+        .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--neon-pink); box-shadow: 0 0 20px rgba(255,0,122,0.2); }
+        .edit-img-overlay { position: absolute; bottom: 5px; right: 5px; background: var(--tokyo-night); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; }
+        .contact-card { background: #f8fafc; padding: 20px; border-radius: 25px; margin-top: 20px; text-align: center; border: 1px solid #e2e8f0; }
+        .ig-btn { display: inline-flex; align-items: center; gap: 10px; color: #e4405f; font-weight: 600; text-decoration: none; font-size: 18px; margin-top: 10px; padding: 10px 20px; background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* --- COMMON UI --- */
+        .page { display: none; animation: slideUp 0.4s ease-out; }
+        .page.active { display: flex; flex-direction: column; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .back-btn { cursor: pointer; padding: 10px; font-size: 20px; color: var(--tokyo-night); margin-right: 10px; }
+        .scroll-area { overflow-y: auto; max-height: 500px; padding-right: 5px; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 320px; padding: 30px; border-radius: 30px; text-align: center; animation: zoomIn 0.3s; }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div id="loginPage" class="page active">
+        <div class="logo-area">
+            <img src="https://img5.pic.in.th/file/secure-sv1/IMG_35975513514fd96e91fd.png">
+            <h2>SIMUANG 1/6</h2>
+            <p>Tokyo Digital Hub Hub</p>
+        </div>
+        <input type="text" id="userInput" placeholder="เลขประจำตัว (Student ID)">
+        <input type="password" id="passInput" placeholder="รหัสผ่าน (Password)">
+        <button onclick="login()" class="btn-action">SIGN IN / เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="dashPage" class="page">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div>
+                <div style="font-size:12px; color:#888;">Logged in as</div>
+                <div id="dashName" style="font-weight:600; font-size:16px;">User Name</div>
+            </div>
+            <img id="dashAvatar" src="" style="width:45px; height:45px; border-radius:50%; border:2px solid var(--neon-pink); cursor:pointer;" onclick="showPage('profilePage')">
+        </div>
+
+        <div class="fund-banner">
+            <div style="font-size:13px; opacity:0.8; margin-bottom:8px;">เงินห้องรวมทั้งหมด</div>
+            <div class="fund-amount" id="totalFund">0 ฿</div>
+            <div id="proofDate" style="font-size:10px; opacity:0.5; margin-top:8px;">ยังไม่ระบุวันที่อัปเดต</div>
+        </div>
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showPage('taskPage')">
+                <i class="fas fa-rocket"></i><b>งานค้าง</b>
+            </div>
+            <div class="menu-item" onclick="showPage('moneyPage')">
+                <i class="fas fa-wallet"></i><b>เงินห้อง</b>
+            </div>
+            <div class="menu-item" onclick="showPage('proofPage')">
+                <i class="fas fa-shield-alt"></i><b>ยืนยันเงิน</b>
+            </div>
+            <div class="menu-item" onclick="showPage('historyPage')">
+                <i class="fas fa-history"></i><b>ประวัติ</b>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskPage" class="page">
+        <div style="display:flex; align-items:center; margin-bottom:20px;">
+            <i class="fas fa-arrow-left back-btn" onclick="showPage('dashPage')"></i>
+            <h3 style="margin:0;">MISSION / งานค้าง</h3>
+        </div>
+        <div style="background:#f1f5f9; padding:15px; border-radius:20px; margin-bottom:20px;">
+            <input type="text" id="taskInput" placeholder="วิชา หรือ งานที่ต้องทำ..." style="margin-bottom:10px;">
+            <button onclick="addTask()" class="btn-action" style="background:var(--primary);">+ เพิ่มภารกิจ</button>
+        </div>
+        <div id="taskList" class="scroll-area"></div>
+    </div>
+
+    <div id="moneyPage" class="page">
+        <div style="display:flex; align-items:center; margin-bottom:15px;">
+            <i class="fas fa-arrow-left back-btn" onclick="showPage('dashPage')"></i>
+            <h3 style="margin:0;">รายชื่อและการจ่ายเงิน</h3>
+        </div>
+        <div id="moneyList" class="scroll-area">
+            </div>
+    </div>
+
+    <div id="proofPage" class="page">
+        <div style="display:flex; align-items:center; margin-bottom:20px;">
+            <i class="fas fa-arrow-left back-btn" onclick="showPage('dashPage')"></i>
+            <h3 style="margin:0;">ตรวจสอบความโปร่งใส</h3>
+        </div>
+        <div id="adminProofArea" style="display:none; margin-bottom:20px; border:2px dashed #ddd; padding:15px; border-radius:20px; text-align:center;">
+            <p style="font-size:12px;">Admin: อัปโหลดรูปบัญชีทุก 3 วัน</p>
+            <input type="file" id="proofUpload" onchange="handleProofUpload(this)" hidden>
+            <button onclick="document.getElementById('proofUpload').click()" class="btn-action" style="font-size:12px; padding:10px; background:var(--gray);"><i class="fas fa-upload"></i> อัปโหลดสลิป/หน้าแอป</button>
+        </div>
+        <div style="background:#000; padding:10px; border-radius:25px; min-height:300px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <img id="proofDisplay" style="width:100%; border-radius:15px; display:none;">
+            <div id="noProofText" style="color:#555; text-align:center;"><i class="fas fa-image" style="font-size:40px;"></i><br>รอแอดมินอัปเดตรูป</div>
+        </div>
+    </div>
+
+    <div id="historyPage" class="page">
+        <div style="display:flex; align-items:center; margin-bottom:20px;">
+            <i class="fas fa-arrow-left back-btn" onclick="showPage('dashPage')"></i>
+            <h3 style="margin:0;">ประวัติการใช้งาน</h3>
+        </div>
+        <div id="historyList" class="scroll-area"></div>
+    </div>
+
+    <div id="profilePage" class="page">
+        <div style="display:flex; align-items:center; margin-bottom:20px;">
+            <i class="fas fa-arrow-left back-btn" onclick="showPage('dashPage')"></i>
+            <h3 style="margin:0;">บัญชีของฉัน</h3>
+        </div>
+
+        <div class="profile-header" style="text-align:center;">
+            <div class="profile-img-wrap">
+                <img id="profileAvatar" src="" class="profile-img">
+                <label for="avatarUpload" class="edit-img-overlay"><i class="fas fa-camera"></i></label>
+                <input type="file" id="avatarUpload" hidden onchange="handleAvatarUpload(this)">
+            </div>
+            <h3 id="profileName" style="margin:0;"></h3>
+            <p id="profileID" style="color:#888; font-size:13px;"></p>
+        </div>
+
+        <div style="background:#f1f5f9; padding:20px; border-radius:30px; margin-top:10px;">
+            <h4 style="margin:0 0 15px 0;"><i class="fas fa-shield-alt"></i> เปลี่ยนรหัสผ่าน</h4>
+            <input type="password" id="oldPass" placeholder="รหัสผ่านเดิม">
+            <input type="password" id="newPass" placeholder="รหัสผ่านใหม่">
+            <input type="password" id="confirmPass" placeholder="ยืนยันรหัสผ่านใหม่">
+            <button onclick="changePassword()" class="btn-action" style="background:var(--primary); font-size:14px;">บันทึกรหัสผ่าน</button>
+        </div>
+
+        <div class="contact-card">
+            <div style="font-size:12px; color:#888;">CONTACT DEVELOPER / ROOM IG</div>
+            <a href="https://www.instagram.com/kwonwoo.b?igsh=MXFhNjN5b2ptcnhjaA%3D%3D&utm_source=qr" target="_blank" class="ig-btn">
+                <i class="fab fa-instagram"></i> @kwonwoo.b
+            </a>
+        </div>
+
+        <button onclick="logout()" class="btn-action" style="margin-top:20px; background:#ef4444; border-bottom-color:#991b1b;">
+            <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+    </div>
+
+</div>
+
+<div id="alertModal" class="modal">
+    <div class="modal-content">
+        <i id="alertIcon" style="font-size:50px; margin-bottom:15px;"></i>
+        <h3 id="alertTitle" style="margin:0 0 10px;"></h3>
+        <p id="alertMsg" style="color:#666; font-size:14px; margin-bottom:20px;"></p>
+        <button onclick="closeModal()" class="btn-action">รับทราบ</button>
+    </div>
+</div>
+
+<script>
+    // --- FULL DATA 1-40 ---
+    const students = [
+        { no: 1, id: "19598", name: "เด็กชายกรวิชญ์ มาตขาว", sex: "M" },
+        { no: 2, id: "19599", name: "เด็กชายกรวิทย์ เจียรนัย", sex: "M" },
+        { no: 3, id: "19600", name: "เด็กชายกิตติพัฒน์ แสงราช", sex: "M" },
+        { no: 4, id: "19601", name: "เด็กชายจิรายุ สาธุพันธ์", sex: "M" },
+        { no: 5, id: "19602", name: "เด็กชายเฉลิมชัย ศรีลาเลิศ", sex: "M" },
+        { no: 6, id: "19603", name: "เด็กชายธีระวัฒน์ จอระนิตย์", sex: "M" },
+        { no: 7, id: "19604", name: "เด็กชายณฐนนท์ ธนูทอง", sex: "M" },
+        { no: 8, id: "19605", name: "เด็กชายณัฐฐศักดิ์ ศรีทา", sex: "M" },
+        { no: 9, id: "19606", name: "นายณัฐพล นาจาน", sex: "M" },
+        { no: 10, id: "19607", name: "เด็กชายณัฐภูมิรินทร์ อ่อนสำอาง", sex: "M" },
+        { no: 11, id: "19608", name: "เด็กชายณัฐกฤต สิมมา", sex: "M" },
+        { no: 12, id: "19609", name: "เด็กชายธนโชติ พวงเงิน", sex: "M" },
+        { no: 13, id: "19610", name: "เด็กชายธนภูมิ บุญเหลา", sex: "M" },
+        { no: 14, id: "19611", name: "เด็กชายปกรณ์ ดวงศรี", sex: "M" },
+        { no: 15, id: "19612", name: "เด็กชายพนธกร สถิตเวโรจน์", sex: "M" },
+        { no: 16, id: "19613", name: "เด็กชายภัทรพล ศรีคำขลิบ", sex: "M" },
+        { no: 17, id: "19614", name: "เด็กชายมหาราช ก้อนคำ", sex: "M" },
+        { no: 18, id: "19615", name: "เด็กชายศรายุทธ โคตมงคล", sex: "M" },
+        { no: 19, id: "19616", name: "เด็กหญิงกรกนก เคนพรม", sex: "F" },
+        { no: 20, id: "19617", name: "เด็กหญิงกันยกร ส้มโย", sex: "F" },
+        { no: 21, id: "19618", name: "เด็กหญิงกิตติพร ทองพูล", sex: "F" },
+        { no: 22, id: "19619", name: "เด็กหญิงขวัญข้าว พานจรุง", sex: "F" },
+        { no: 23, id: "19620", name: "เด็กหญิงจันทรวิภา นาคะบุตร", sex: "F" },
+        { no: 24, id: "19621", name: "เด็กหญิงชัชฎาภรณ์ สุดสวย", sex: "F" },
+        { no: 25, id: "19622", name: "เด็กหญิงฑิตะยา อนุสนธิ์", sex: "F" },
+        { no: 26, id: "19623", name: "เด็กหญิงณัชนิกาญจน์ สุดรักษา", sex: "F" },
+        { no: 27, id: "19624", name: "เด็กหญิงณัฐณิชา วามะเกตุ", sex: "F" },
+        { no: 28, id: "19625", name: "เด็กหญิงณัฐธิดา พิมพ์พันธ์", sex: "F" },
+        { no: 29, id: "19626", name: "เด็กหญิงธนพร พลสมัคร", sex: "F" },
+        { no: 30, id: "19627", name: "เด็กหญิงนงนุช มิตตะมา", sex: "F" },
+        { no: 31, id: "19628", name: "เด็กหญิงนภัสร จรลี", sex: "F" },
+        { no: 32, id: "19629", name: "เด็กหญิงนริศรา พรมจำปา", sex: "F" },
+        { no: 33, id: "19630", name: "เด็กหญิงน้ำฝน โขมจิตร", sex: "F" },
+        { no: 34, id: "19631", name: "เด็กหญิงบุษรินทร์ ทองศรี", sex: "F" },
+        { no: 35, id: "19632", name: "เด็กหญิงปาณิสรา เดชะคำภู", sex: "F" },
+        { no: 36, id: "19633", name: "เด็กหญิงพิชญา สีมาขันธ์", sex: "F" },
+        { no: 37, id: "19634", name: "เด็กหญิงวรัญญา สุทธิ", sex: "F" },
+        { no: 38, id: "19635", name: "เด็กหญิงศุภิสรา ศรีบุตรตา", sex: "F" },
+        { no: 39, id: "19636", name: "เด็กหญิงสุดาวรรณ กุลธิ", sex: "F" },
+        { no: 40, id: "19637", name: "เด็กหญิงอมิตา ยมพิมาย", sex: "F" }
+    ];
+
+    let currentUser = null;
+    let isAdmin = false;
+    const defAvatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+    // DB Objects
+    let db_pass = JSON.parse(localStorage.getItem('m6_passwords')) || {};
+    let db_avatars = JSON.parse(localStorage.getItem('m6_avatars')) || {};
+    let db_money = JSON.parse(localStorage.getItem('m6_money_v5')) || {};
+    let db_tasks = JSON.parse(localStorage.getItem('m6_tasks')) || [];
+    let db_proof = JSON.parse(localStorage.getItem('m6_proof')) || { img: null, date: null };
+    let db_logs = JSON.parse(localStorage.getItem('m6_logs')) || [];
+
+    // --- NAVIGATION ---
+    function showPage(pid) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pid).classList.add('active');
+        if(pid === 'moneyPage') renderMoney();
+        if(pid === 'taskPage') renderTasks();
+        if(pid === 'proofPage') renderProof();
+        if(pid === 'profilePage') renderProfile();
+        if(pid === 'historyPage') renderLogs();
+    }
+
+    // --- AUTH ---
+    function login() {
+        const id = document.getElementById('userInput').value.trim();
+        const pass = document.getElementById('passInput').value.trim();
+
+        if(id === "Admin" && pass === "123456") {
+            currentUser = "Admin"; isAdmin = true;
+            addLog("Admin", "Logged In");
+            enterApp();
+        } else {
+            const student = students.find(s => s.id === id);
+            const savedPass = db_pass[id] || id; // Default is ID
+            if(student && pass === savedPass) {
+                currentUser = id; isAdmin = false;
+                addLog(student.name, "Logged In");
+                enterApp();
+            } else {
+                showModal("error", "เข้าสู่ระบบไม่สำเร็จ", "ไอดีหรือรหัสผ่านไม่ถูกต้อง");
+            }
+        }
+    }
+
+    function enterApp() {
+        const s = isAdmin ? { name: "SYSTEM ADMIN" } : students.find(x => x.id === currentUser);
+        document.getElementById('dashName').innerText = s.name;
+        document.getElementById('dashAvatar').src = db_avatars[currentUser] || defAvatar;
+        updateTotalFund();
+        showPage('dashPage');
+    }
+
+    // --- MONEY SYSTEM ---
+    function renderMoney() {
+        const list = document.getElementById('moneyList');
+        let html = "";
+        
+        // Boys
+        html += `<div class="gender-divider" style="background:#e0f2fe; color:var(--primary);"><i class="fas fa-mars"></i> นักเรียนชาย (1-18)</div>`;
+        students.filter(s => s.sex === "M").forEach(s => html += getMoneyRow(s));
+        
+        // Girls
+        html += `<div class="gender-divider" style="background:#fce7f3; color:var(--neon-pink);"><i class="fas fa-venus"></i> นักเรียนหญิง (19-40)</div>`;
+        students.filter(s => s.sex === "F").forEach(s => html += getMoneyRow(s));
+        
+        list.innerHTML = html;
+    }
+
+    function getMoneyRow(s) {
+        const data = db_money[s.id] || { status: 'none', amount: 0 };
+        let bClass = "status-none", bText = "ไม่มีสถานะ";
+        if(data.status === 'complete') { bClass = "status-complete"; bText = `ครบ (${data.amount})`; }
+        else if(data.status === 'incomplete') { bClass = "status-incomplete"; bText = `ไม่ครบ (${data.amount})`; }
+
+        return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #f1f5f9;">
+                <span style="font-size:14px;">${s.no}. ${s.name}</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="status-badge ${bClass}">${bText}</span>
+                    ${isAdmin ? `<i class="fas fa-edit" style="color:var(--primary); cursor:pointer;" onclick="editMoney('${s.id}', '${s.name}')"></i>` : ''}
+                </div>
+            </div>`;
+    }
+
+    function editMoney(id, name) {
+        const mode = prompt(`สถานะการจ่ายเงินของ ${name}:\n1 = จ่ายครบ\n2 = ยังไม่ครบ\n3 = ยกเลิกสถานะ`);
+        if(!mode) return;
+        let status = 'none', amount = 0;
+        if(mode === "1") { status = 'complete'; amount = prompt("ยอดเงินที่จ่ายครบ (ระบุ):", 20) || 20; }
+        else if(mode === "2") { status = 'incomplete'; amount = prompt("ยอดเงินที่จ่ายมาแล้ว (ระบุ):", 0) || 0; }
+        
+        db_money[id] = { status, amount: parseInt(amount) };
+        localStorage.setItem('m6_money_v5', JSON.stringify(db_money));
+        addLog("Admin", `Updated money for ${name}`);
+        renderMoney();
+        updateTotalFund();
+    }
+
+    function updateTotalFund() {
+        let total = 0;
+        Object.values(db_money).forEach(v => total += (v.amount || 0));
+        document.getElementById('totalFund').innerText = total.toLocaleString() + " ฿";
+    }
+
+    // --- TASK SYSTEM ---
+    function addTask() {
+        const val = document.getElementById('taskInput').value;
+        if(!val) return;
+        const s = isAdmin ? { name: "ADMIN" } : students.find(x => x.id === currentUser);
+        db_tasks.unshift({ id: Date.now(), owner: currentUser, name: s.name, title: val, done: false });
+        localStorage.setItem('m6_tasks', JSON.stringify(db_tasks));
+        document.getElementById('taskInput').value = "";
+        renderTasks();
+    }
+
+    function renderTasks() {
+        const list = document.getElementById('taskList');
+        list.innerHTML = db_tasks.map(t => `
+            <div class="task-card ${t.done ? 'done' : ''}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <span class="task-owner">${t.name}</span>
+                    ${(t.owner === currentUser || isAdmin) ? `
+                        <div style="display:flex; gap:10px;">
+                            <i class="fas fa-check-circle" style="color:var(--success); cursor:pointer;" onclick="toggleTask(${t.id})"></i>
+                            <i class="fas fa-trash" style="color:#ef4444; cursor:pointer;" onclick="delTask(${t.id})"></i>
+                        </div>` : ''}
+                </div>
+                <div style="font-weight:600; margin-top:10px; font-size:15px;">${t.title}</div>
+            </div>`).join('');
+    }
+
+    function toggleTask(id) {
+        db_tasks = db_tasks.map(t => t.id === id ? {...t, done: !t.done} : t);
+        localStorage.setItem('m6_tasks', JSON.stringify(db_tasks));
+        renderTasks();
+    }
+
+    function delTask(id) {
+        if(!confirm("ลบงานนี้ใช่หรือไม่?")) return;
+        db_tasks = db_tasks.filter(t => t.id !== id);
+        localStorage.setItem('m6_tasks', JSON.stringify(db_tasks));
+        renderTasks();
+    }
+
+    // --- PROFILE & PASSWORD ---
+    function renderProfile() {
+        const s = isAdmin ? { name: "SYSTEM ADMINISTRATOR", id: "ADMIN" } : students.find(x => x.id === currentUser);
+        document.getElementById('profileName').innerText = s.name;
+        document.getElementById('profileID').innerText = "ID: " + s.id;
+        document.getElementById('profileAvatar').src = db_avatars[currentUser] || defAvatar;
+    }
+
+    function handleAvatarUpload(input) {
+        if(input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                db_avatars[currentUser] = e.target.result;
+                localStorage.setItem('m6_avatars', JSON.stringify(db_avatars));
+                document.getElementById('profileAvatar').src = e.target.result;
+                document.getElementById('dashAvatar').src = e.target.result;
+                showModal("success", "เรียบร้อย", "เปลี่ยนรูปโปรไฟล์สำเร็จ");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function changePassword() {
+        const oldP = document.getElementById('oldPass').value;
+        const newP = document.getElementById('newPass').value;
+        const confP = document.getElementById('confirmPass').value;
+        const currentSaved = db_pass[currentUser] || currentUser;
+
+        if(oldP !== currentSaved) return showModal("error", "ผิดพลาด", "รหัสผ่านเดิมไม่ถูกต้อง");
+        if(newP.length < 4) return showModal("error", "ผิดพลาด", "รหัสผ่านใหม่สั้นเกินไป");
+        if(newP !== confP) return showModal("error", "ผิดพลาด", "ยืนยันรหัสผ่านใหม่ไม่ตรงกัน");
+
+        db_pass[currentUser] = newP;
+        localStorage.setItem('m6_passwords', JSON.stringify(db_pass));
+        showModal("success", "สำเร็จ", "เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว");
+        document.getElementById('oldPass').value = ""; document.getElementById('newPass').value = ""; document.getElementById('confirmPass').value = "";
+    }
+
+    // --- PROOF SYSTEM ---
+    function renderProof() {
+        if(isAdmin) document.getElementById('adminProofArea').style.display = "block";
+        if(db_proof.img) {
+            const im = document.getElementById('proofDisplay');
+            im.src = db_proof.img; im.style.display = "block";
+            document.getElementById('noProofText').style.display = "none";
+            document.getElementById('proofDate').innerText = "Update: " + db_proof.date;
+        }
+    }
+
+    function handleProofUpload(input) {
+        if(input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                db_proof = { img: e.target.result, date: new Date().toLocaleString('th-TH') };
+                localStorage.setItem('m6_proof', JSON.stringify(db_proof));
+                renderProof();
+                showModal("success", "สำเร็จ", "อัปโหลดหลักฐานยอดเงินแล้ว");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- LOGS ---
+    function addLog(name, action) {
+        db_logs.unshift({ name, action, time: new Date().toLocaleString('th-TH') });
+        localStorage.setItem('m6_logs', JSON.stringify(db_logs));
+    }
+
+    function renderLogs() {
+        const list = document.getElementById('historyList');
+        list.innerHTML = db_logs.slice(0, 30).map(l => `
+            <div style="padding:10px; border-bottom:1px solid #eee; font-size:12px;">
+                <b>${l.name}</b> <span style="color:var(--primary);">${l.action}</span><br>
+                <small style="color:#aaa;">${l.time}</small>
+            </div>`).join('');
+    }
+
+    // --- UTILS ---
+    function showModal(type, title, msg) {
+        const icon = document.getElementById('alertIcon');
+        icon.className = type === "success" ? "fas fa-check-circle" : "fas fa-times-circle";
+        icon.style.color = type === "success" ? "var(--success)" : "#ef4444";
+        document.getElementById('alertTitle').innerText = title;
+        document.getElementById('alertMsg').innerText = msg;
+        document.getElementById('alertModal').style.display = "flex";
+    }
+
+    function closeModal() { document.getElementById('alertModal').style.display = "none"; }
+    function logout() { location.reload(); }
+</script>
+</body>
+</html>
